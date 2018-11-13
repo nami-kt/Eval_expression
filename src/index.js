@@ -2,6 +2,7 @@ function solveExpression() {
   var expression = document.getElementById("expression").value;
   var sepExp = [];
   let number = 0,
+    firstNumSign = 1,
     power = 0;
   for (let i = 0; i < expression.length; i++) {
     if ("1234567890".includes(expression.charAt(i))) {
@@ -12,13 +13,22 @@ function solveExpression() {
     } else if (".,".includes(expression.charAt(i))) {
       power--;
     } else if ("+-*/".includes(expression.charAt(i))) {
-      power = 0;
-      sepExp.push(number);
-      number = 0;
-      sepExp.push(expression.charAt(i));
+      if (i === 0 && expression.charAt(i) === "-") {
+        firstNumSign = -1;
+      } else {
+        power = 0;
+        sepExp.push(number * firstNumSign);
+        firstNumSign = 1;
+        number = 0;
+        sepExp.push(expression.charAt(i));
+      }
     }
   }
-  sepExp.push(number);
+  if (sepExp.length == 0) {
+    sepExp.push(number * firstNumSign);
+  } else {
+    sepExp.push(number);
+  }
 
   for (let i = 0; i < sepExp.length; i++) {
     if ("*/".includes(sepExp[i])) {
