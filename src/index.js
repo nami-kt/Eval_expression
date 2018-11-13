@@ -1,37 +1,42 @@
 function solveExpression() {
   var expression = document.getElementById("expression").value;
-  let left = 0,
-    right = 0;
-  var isFirst = true;
-  var operator = "+";
-  var result = 0;
-
+  var sepExp = [];
+  let number = 0,
+    power = 0;
   for (let i = 0; i < expression.length; i++) {
-    if (
-      expression.charAt(i) === "+" ||
-      expression.charAt(i) === "-" ||
-      expression.charAt(i) === "*" ||
-      expression.charAt(i) === "/"
-    ) {
-      if (!isFirst) {
-        left = mathUp[operator](left, right);
-        right = 0;
-      } else {
-        isFirst = false;
+    if ("1234567890".includes(expression.charAt(i))) {
+      if (power === 0) {
+        number *= 10;
       }
+      number += parseInt(expression.charAt(i)) * Math.pow(10, power);
+    } else if (".,".includes(expression.charAt(i))) {
+      power--;
+    } else if ("+-*/".includes(expression.charAt(i))) {
+      power = 0;
+      sepExp.push(number);
+      number = 0;
+      sepExp.push(expression.charAt(i));
+    }
+  }
+  sepExp.push(number);
 
-      operator = expression.charAt(i);
-    } else {
-      if (isFirst) {
-        left = left * 10 + parseInt(expression.charAt(i));
-      } else {
-        right = right * 10 + parseInt(expression.charAt(i));
-      }
+  for (let i = 0; i < sepExp.length; i++) {
+    if ("*/".includes(sepExp[i])) {
+      let num = mathUp[sepExp[i]](sepExp[i - 1], sepExp[i + 1]);
+      sepExp.splice(i - 1, 3, num);
+      i--;
     }
   }
 
-  result += mathUp[operator](left, right);
-  document.getElementById("result").innerHTML = "Vysledek je: " + result;
+  for (let i = 0; i < sepExp.length; i++) {
+    if ("+-".includes(sepExp[i])) {
+      let num = mathUp[sepExp[i]](sepExp[i - 1], sepExp[i + 1]);
+      sepExp.splice(i - 1, 3, num);
+      i--;
+    }
+  }
+
+  document.getElementById("result").innerHTML = "Vysledek je: " + sepExp[0];
 }
 
 const mathUp = {
